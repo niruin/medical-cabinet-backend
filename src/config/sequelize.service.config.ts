@@ -7,6 +7,10 @@ import {
 
 import { User } from '../users/models/users.model';
 import { EnumConfig } from './enum.config';
+import { Role } from '../roles/models/roles.model';
+import { Schedule } from '../schedule/models/schedule.model';
+import { Patient } from '../patients/models/patients.model';
+import { Doctor } from '../doctors/models/doctors.model';
 
 @Injectable()
 export class SequelizeServiceConfig implements SequelizeOptionsFactory {
@@ -25,7 +29,7 @@ export class SequelizeServiceConfig implements SequelizeOptionsFactory {
       username,
       password,
       database,
-      models: [User],
+      models: [Role, User, Schedule, Doctor, Patient],
       autoLoadModels: true,
       synchronize: true,
     };

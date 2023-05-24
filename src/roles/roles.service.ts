@@ -12,7 +12,7 @@ export class RolesService {
     private roleModel: typeof Role,
   ) {}
 
-  async findAll(): Promise<Role[]> {
+  async existenceСheck() {
     const existingRoles = await this.roleModel.findAll();
 
     if (existingRoles.length === 0) {
@@ -23,10 +23,15 @@ export class RolesService {
         { name: Roles.ADMIN },
       ]);
     }
-    return this.roleModel.findAll();
   }
 
-  findOne(filter: RolesFilter): Promise<Role> {
+  async findAll(): Promise<Role[]> {
+    await this.existenceСheck();
+    return this.roleModel.findAll({ raw: true });
+  }
+
+  async findOne(filter: RolesFilter): Promise<Role> {
+    await this.existenceСheck();
     return this.roleModel.findOne(filter);
   }
 }

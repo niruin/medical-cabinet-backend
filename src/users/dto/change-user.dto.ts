@@ -2,6 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 
 export class ChangeUserDto {
+  @ApiProperty({ example: '1' })
+  @IsNotEmpty()
+  readonly id: number;
+
   @ApiProperty({ example: 'example@mail.com' })
   @IsNotEmpty()
   readonly email: string;
@@ -33,4 +37,8 @@ export class ChangeUserDto {
   @ApiProperty({ example: 'male' })
   @IsNotEmpty()
   readonly gender: string;
+
+  @ApiProperty({ example: 'Админ' })
+  @IsNotEmpty()
+  readonly role: string;
 }

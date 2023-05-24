@@ -7,10 +7,11 @@ import {
   HttpStatus,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { AuthenticatedGuard } from '../auth/authenticated.guard';
 import { UsersService } from './users.service';
@@ -27,11 +28,35 @@ import {
   UsersAllResponse,
 } from './types';
 import { ChangeUserDto } from './dto/change-user.dto';
+import { ChangeRoleUserDto } from './dto/change-role-user.dto';
 
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @ApiOkResponse({ type: ProfileResponse })
+  @Get('/profile')
+  @UseGuards(AuthenticatedGuard)
+  getProfile(@Request() req) {
+    return this.usersService.profile({
+      where: { email: req.user.email },
+    });
+  }
+  @ApiOkResponse({ type: UsersAllResponse })
+  @Get('/all')
+  @UseGuards(AuthenticatedGuard)
+  getUsersAll(@Request() req) {
+    const userId = String(req.user.userId);
+    return this.usersService.findAll(userId);
+  }
+
+  @ApiOkResponse({ type: LogoutUserResponse })
+  @Get('/logout')
+  logout(@Request() req) {
+    req.session.destroy();
+    return { status: 'success', message: 'Сессия завершена' };
+  }
 
   @ApiOkResponse({ type: SignupResponse })
   @Post('/signup')
@@ -56,36 +81,29 @@ export class UsersController {
     };
   }
 
-  @ApiOkResponse({ type: ProfileResponse })
-  @Get('/profile')
-  @UseGuards(AuthenticatedGuard)
-  getProfile(@Request() req) {
-    return this.usersService.profile({
-      where: { email: req.user.email },
-    });
-  }
-
-  @ApiOkResponse({ type: LogoutUserResponse })
-  @Get('/logout')
-  logout(@Request() req) {
-    req.session.destroy();
-    return { status: 'success', message: 'Сессия завершена' };
-  }
-
   @ApiBody({ type: UserChangeRequest })
   @ApiOkResponse({ type: UserUpdateResponse })
+  @ApiQuery({
+    name: 'userIdToEdit',
+    type: String,
+    description: 'A parameter. Optional',
+    required: false,
+  })
   @Patch('/update')
   @UseGuards(AuthenticatedGuard)
-  update(@Request() req, @Body() updateUserDto: ChangeUserDto) {
-    const userId = String(req.user.userId);
-    return this.usersService.update(userId, updateUserDto);
+  update(
+    @Query('userIdToEdit') userIdToEdit: string,
+    @Request() req,
+    @Body() updateUserDto: ChangeUserDto,
+  ) {
+    const currentUserId = String(req.user.userId);
+    return this.usersService.update(currentUserId, updateUserDto, userIdToEdit);
   }
 
-  @ApiOkResponse({ type: UsersAllResponse })
-  @Get('/all')
+  @Patch('/change-role')
   @UseGuards(AuthenticatedGuard)
-  getUsersAll(@Request() req) {
-    const userId = String(req.user.userId);
-    return this.usersService.findAll(userId);
+  changeRole(@Request() req, @Body() changeRoleUserDto: ChangeRoleUserDto) {
+    const userIdReq = String(req.user.userId);
+    return this.usersService.changeRole(userIdReq, changeRoleUserDto);
   }
 }

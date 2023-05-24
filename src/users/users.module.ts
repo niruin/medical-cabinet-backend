@@ -5,9 +5,10 @@ import { UsersController } from './users.controller';
 import { User } from './models/users.model';
 import { UsersService } from './users.service';
 import { RolesModule } from '../roles/roles.module';
+import { DoctorsModule } from '../doctors/doctors.module';
 
 @Module({
-  imports: [RolesModule, SequelizeModule.forFeature([User])],
+  imports: [RolesModule, DoctorsModule, SequelizeModule.forFeature([User])],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],

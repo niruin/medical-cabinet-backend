@@ -7,6 +7,9 @@ import { databaseConfig } from './config/configuration';
 import { SequelizeServiceConfig } from './config/sequelize.service.config';
 import { AuthModule } from './auth/auth.module';
 import { RolesModule } from './roles/roles.module';
+import { ScheduleModule } from './schedule/schedule.module';
+import { PatientsModule } from './patients/patients.module';
+import { DoctorsModule } from './doctors/doctors.module';
 
 @Module({
   imports: [
@@ -18,8 +21,11 @@ import { RolesModule } from './roles/roles.module';
       load: [databaseConfig],
     }),
     AuthModule,
-    UsersModule,
     RolesModule,
+    ScheduleModule,
+    UsersModule,
+    PatientsModule,
+    DoctorsModule,
   ],
 })
 export class AppModule {}

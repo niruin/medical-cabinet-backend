@@ -107,6 +107,8 @@ export class ProfileResponse {
 }
 
 export class UserChangeRequest {
+  @ApiProperty({ example: '1' }) id: number;
+
   @ApiProperty({ example: 'example@gmail.com' }) email: string;
 
   @ApiProperty({ example: 'Ivan' }) firstName: string;
@@ -141,8 +143,8 @@ export class UsersAllResponse {
   @ApiProperty({ example: 'Список пользователей получен' })
   message: string;
 
-  @ApiProperty({ type: [ProfileResponse] })
-  data: [ProfileResponse];
+  @ApiProperty({ type: [ProfileResponseData] })
+  data: [ProfileResponseData];
 }
 
 export type UsersFilter = {

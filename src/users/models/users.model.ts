@@ -1,4 +1,8 @@
-import { Table, Model, Column } from 'sequelize-typescript';
+import { Table, Model, Column, HasOne } from 'sequelize-typescript';
+
+import { Doctor } from '../../doctors/models/doctors.model';
+import { Patient } from '../../patients/models/patients.model';
+import { Role } from '../../roles/models/roles.model';
 
 @Table
 export class User extends Model {
@@ -31,4 +35,13 @@ export class User extends Model {
 
   @Column
   roleId: number;
+
+  @HasOne(() => Doctor)
+  doctor: Doctor;
+
+  @HasOne(() => Patient)
+  patient: Patient;
+
+  @HasOne(() => Role)
+  role: Role;
 }
