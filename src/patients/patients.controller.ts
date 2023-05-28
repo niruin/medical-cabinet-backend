@@ -11,7 +11,7 @@ export class PatientsController {
 
   @Get('/list')
   @UseGuards(AuthenticatedGuard)
-  doctorList(@Request() req) {
+  list(@Request() req) {
     const userId = String(req.user.userId);
     return this.patientsService.findAll(userId);
   }

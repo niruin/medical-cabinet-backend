@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  SequelizeModuleOptions,
-  SequelizeOptionsFactory,
-} from '@nestjs/sequelize';
+import { SequelizeModuleOptions, SequelizeOptionsFactory } from '@nestjs/sequelize';
 
 import { User } from '../users/models/users.model';
 import { EnumConfig } from './enum.config';

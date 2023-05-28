@@ -2,8 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
 import { Patient } from './models/patients.model';
-import { CreatePatientDto } from './dto/create-patient.dto';
-import { User } from '../users/models/users.model';
 
 @Injectable()
 export class PatientsService {
@@ -21,6 +19,10 @@ export class PatientsService {
 
   async findOne(userId: number): Promise<any> {
     return await this.patientModel.findOne({ where: { userId: userId } });
+  }
+
+  async remove(userId: number): Promise<any> {
+    return await this.patientModel.destroy({ where: { userId: userId } });
   }
 
   async create(userId: number): Promise<any> {

@@ -9,12 +9,7 @@ import { PatientsModule } from '../patients/patients.module';
 import { DoctorsModule } from '../doctors/doctors.module';
 
 @Module({
-  imports: [
-    UsersModule,
-    PatientsModule,
-    DoctorsModule,
-    SequelizeModule.forFeature([Schedule]),
-  ],
+  imports: [UsersModule, PatientsModule, DoctorsModule, SequelizeModule.forFeature([Schedule])],
   controllers: [ScheduleController],
   providers: [ScheduleService],
   exports: [ScheduleService],

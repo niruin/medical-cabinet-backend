@@ -5,7 +5,7 @@ export class ChangeScheduleDto {
   readonly id: number;
 
   @ApiProperty({ example: 1 })
-  readonly patientId: number;
+  readonly userId: number;
 
   @ApiProperty({ example: 1 })
   readonly doctorId: number;
@@ -19,5 +19,10 @@ export class ChangeScheduleDto {
   @ApiProperty({
     example: 'Sat May 20 2023 11:00:40 GMT+0300 (Москва, стандартное время)',
   })
-  readonly date: string;
+  readonly startDate: Date;
+
+  @ApiProperty({
+    example: 'Sat May 20 2023 11:00:40 GMT+0300 (Москва, стандартное время)',
+  })
+  readonly endDate: Date;
 }

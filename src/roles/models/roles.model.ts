@@ -1,10 +1,4 @@
-import {
-  Table,
-  Model,
-  Column,
-  BelongsTo,
-  ForeignKey,
-} from 'sequelize-typescript';
+import { Table, Model, Column, BelongsTo, ForeignKey } from 'sequelize-typescript';
 
 import { Roles } from '../enums/roles.enums';
 import { User } from '../../users/models/users.model';

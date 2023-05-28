@@ -6,6 +6,7 @@ import {
   Get,
   Patch,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -21,26 +22,19 @@ import { ScheduleListResponse } from './types/schedule.types';
 @Controller('schedule')
 export class ScheduleController {
   @ApiOkResponse({ type: ScheduleListResponse })
-  @Get('/patient')
+  @Get('/list')
   @UseGuards(AuthenticatedGuard)
-  patientList(@Request() req) {
+  list(@Query('doctorId') doctorId: string, @Request() req) {
     const userId = String(req.user.userId);
-    return this.scheduleService.patientList(userId);
+    return this.scheduleService.list(userId, doctorId);
   }
 
-  @ApiOkResponse({ type: ScheduleListResponse })
-  @Get('/doctor')
-  @UseGuards(AuthenticatedGuard)
-  doctorList(@Request() req) {
-    const userId = String(req.user.userId);
-    return this.scheduleService.doctorList(userId);
-  }
   constructor(private readonly scheduleService: ScheduleService) {}
   @Post('/create')
   @UseGuards(AuthenticatedGuard)
   create(@Request() req, @Body() createScheduleDto: CreateScheduleDto) {
-    const userId = req.user.userId;
-    return this.scheduleService.create(userId, createScheduleDto);
+    const reqUserId = req.user.userId;
+    return this.scheduleService.create(reqUserId, createScheduleDto);
   }
 
   @Patch('/update')

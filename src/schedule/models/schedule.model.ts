@@ -1,10 +1,4 @@
-import {
-  Table,
-  Model,
-  Column,
-  ForeignKey,
-  BelongsTo,
-} from 'sequelize-typescript';
+import { Table, Model, Column, ForeignKey, BelongsTo } from 'sequelize-typescript';
 
 import { Patient } from '../../patients/models/patients.model';
 import { Doctor } from '../../doctors/models/doctors.model';
@@ -15,18 +9,20 @@ export class Schedule extends Model {
 
   @Column comments: string;
 
-  @Column date: string;
+  @Column startDate: Date;
+
+  @Column endDate: Date;
 
   @ForeignKey(() => Patient)
   @Column
   patientId: number;
 
-  @BelongsTo(() => Patient)
-  patient: Patient;
-
   @ForeignKey(() => Doctor)
   @Column
   doctorId: number;
+
+  @BelongsTo(() => Patient)
+  patient: Patient;
 
   @BelongsTo(() => Doctor)
   doctor: Doctor;

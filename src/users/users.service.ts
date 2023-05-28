@@ -10,16 +10,16 @@ import { RolesService } from '../roles/roles.service';
 import { ChangeUserDto } from './dto/change-user.dto';
 import { DoctorsService } from '../doctors/doctors.service';
 import { ChangeRoleUserDto } from './dto/change-role-user.dto';
-import { ScheduleService } from '../schedule/schedule.service';
+import { PatientsService } from '../patients/patients.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User)
     private userModel: typeof User,
-
     private readonly roleService: RolesService,
     private readonly doctorService: DoctorsService,
+    private readonly patientService: PatientsService,
   ) {}
 
   findOne(filter: UsersFilter): Promise<any> {
@@ -37,9 +37,7 @@ export class UsersService {
     };
   }
 
-  async create(
-    createUserDto: CreateUserDto,
-  ): Promise<any | { warningMessage: string }> {
+  async create(createUserDto: CreateUserDto): Promise<any | { warningMessage: string }> {
     const user = new User();
     const existingByEmail = await this.findOne({
       where: { email: createUserDto.email },
@@ -73,34 +71,18 @@ export class UsersService {
     };
   }
 
-  async update(
-    currentUserId: string,
-    changeDataUser: ChangeUserDto,
-    //TODO удалить
-    userIdToEdit?: string,
-  ): Promise<any> {
-    // const user = await this.findOne({
-    //   where: { id: currentUserId },
-    // });
+  async update(userIdReq: string, changeDataUser: ChangeUserDto): Promise<any> {
+    const userReqFilter = { where: { id: userIdReq } };
+    const userReq = await this.findOne(userReqFilter);
 
-    // const userData = await this.findOne({
-    //   where: { id: String(changeDataUser.id) },
-    // });
+    const isAdmin = userReq.roleId === 4;
+    const isSelfEdit = Number(userIdReq) === changeDataUser.id;
 
-    // const { id, role, ...changeDataUserDefaultProps } = changeDataUser;
-
-    // let dataToUpdate = {
-    //   ...changeDataUserDefaultProps,
-    //   roleId: userData.roleId,
-    // };
-    //
-    // if (user.roleId === 4) {
-    //   const roleUser = await this.roleService.findOne({
-    //     where: { name: role },
-    //   });
-    //
-    //   dataToUpdate = { ...dataToUpdate, roleId: roleUser.id };
-    // }
+    if (!isAdmin) {
+      if (!isSelfEdit) {
+        throw new ForbiddenException();
+      }
+    }
 
     await this.userModel.update(
       { ...changeDataUser },
@@ -111,42 +93,53 @@ export class UsersService {
       },
     );
 
-    // if (user.roleId === 4 && dataToUpdate.roleId === 3) {
-    //   await this.doctorService.create(id);
-    // }
-
     return {
       status: 'success',
       message: 'Изменения сохранены',
     };
   }
 
-  async changeRole(
+  async changerRoleAdminAccess(
     userIdReq: string,
     changeRoleUserDto: ChangeRoleUserDto,
   ): Promise<any> {
-    const userReq = await this.findOne({
-      where: { id: userIdReq },
-    });
+    const userReqFilter = { where: { id: userIdReq } };
+    const userReq = await this.findOne(userReqFilter);
 
-    if (userReq.roleId !== 4) {
-      throw new ForbiddenException();
+    if (userReq.roleId !== 4) throw new ForbiddenException();
+
+    return await this.changeRole(changeRoleUserDto);
+  }
+
+  async changeRole(changeRoleUserDto: ChangeRoleUserDto): Promise<any> {
+    const patchUserFilter = { where: { id: String(changeRoleUserDto.id) } };
+    const patchUser = await this.findOne(patchUserFilter);
+
+    const roleToPatchFilter = { where: { name: changeRoleUserDto.role } };
+    const roleToPatch = await this.roleService.findOne(roleToPatchFilter);
+
+    // action for previous role
+    switch (patchUser.roleId) {
+      case 2:
+        await this.patientService.remove(patchUser.id);
+        break;
+      case 3:
+        await this.doctorService.remove(patchUser.id);
+        break;
+      default:
+        break;
     }
 
-    const patchUser = await this.findOne({
-      where: { id: String(changeRoleUserDto.id) },
-    });
-
-    const roleToPatch = await this.roleService.findOne({
-      where: { name: changeRoleUserDto.role },
-    });
-
-    if (patchUser.roleId === 3 && roleToPatch.id !== 3) {
-      const doctor = await this.doctorService.findOne({
-        where: { userId: patchUser.id },
-      });
-
-      await this.doctorService.remove({ where: { id: doctor.id } });
+    // action for new role
+    switch (roleToPatch.id) {
+      case 2:
+        await this.patientService.create(patchUser.id);
+        break;
+      case 3:
+        await this.doctorService.create(patchUser.id);
+        break;
+      default:
+        break;
     }
 
     await this.userModel.update(
@@ -157,10 +150,6 @@ export class UsersService {
         },
       },
     );
-
-    if (roleToPatch.id === 3) {
-      await this.doctorService.create(patchUser.id);
-    }
 
     return {
       status: 'success',

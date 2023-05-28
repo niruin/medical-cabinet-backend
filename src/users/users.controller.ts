@@ -96,14 +96,14 @@ export class UsersController {
     @Request() req,
     @Body() updateUserDto: ChangeUserDto,
   ) {
-    const currentUserId = String(req.user.userId);
-    return this.usersService.update(currentUserId, updateUserDto, userIdToEdit);
+    const userIdReq = String(req.user.userId);
+    return this.usersService.update(userIdReq, updateUserDto);
   }
 
   @Patch('/change-role')
   @UseGuards(AuthenticatedGuard)
   changeRole(@Request() req, @Body() changeRoleUserDto: ChangeRoleUserDto) {
     const userIdReq = String(req.user.userId);
-    return this.usersService.changeRole(userIdReq, changeRoleUserDto);
+    return this.usersService.changerRoleAdminAccess(userIdReq, changeRoleUserDto);
   }
 }

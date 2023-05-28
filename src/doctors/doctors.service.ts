@@ -53,9 +53,7 @@ export class DoctorsService {
     };
   }
 
-  async remove(options): Promise<void> {
-    const doctor = await this.findOne(options);
-    // await this.scheduleService.remove({ where: { doctorId: doctor.id } });
-    await doctor.destroy();
+  async remove(userId: number): Promise<void> {
+    await this.doctorModel.destroy({ where: { userId: userId } });
   }
 }
