@@ -50,6 +50,12 @@ class Schedule {
 
   @ApiProperty({ type: SchedulePerson, example: schedulePersonExample })
   doctor: SchedulePerson;
+
+  @ApiProperty({ example: false })
+  editable: boolean;
+
+  @ApiProperty({ example: false })
+  disabled: boolean;
 }
 
 export class ScheduleListResponse {

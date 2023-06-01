@@ -113,7 +113,7 @@ export class ScheduleService {
   async update(reqUserId: string, changeScheduleDto: ChangeScheduleDto): Promise<any> {
     const user = await this.userService.findOne({ where: { id: reqUserId } });
     const { id, ...rest } = changeScheduleDto;
-    if (user.roleId !== 3) {
+    if (user.roleId < 3) {
       throw new ForbiddenException();
     }
 
@@ -126,9 +126,12 @@ export class ScheduleService {
       },
     );
 
+    const data = await this.scheduleModel.findOne({ where: { id: String(id) }, raw: true });
+
     return {
       status: 'success',
       message: 'Заявка успешно изменена',
+      data: data,
     };
   }
 
@@ -142,11 +145,8 @@ export class ScheduleService {
   }
 
   async list(reqUserId: string, doctorId: string): Promise<any> {
+    const userReq = await this.userService.findOne({ where: { id: reqUserId } });
     const user = await this.doctorService.findOne({ where: { id: doctorId } });
-
-    // if (user.roleId !== 3) {
-    //   throw new ForbiddenException();
-    // }
 
     const { userId } = user;
 
@@ -206,8 +206,21 @@ export class ScheduleService {
             middleName: item['patient.user.middleName'],
             lastName: item['patient.user.lastName'],
           },
+          editable: true,
+          disabled: hasDisabled(item),
         }));
       });
+
+    function hasDisabled(item) {
+      if (userReq.roleId === 4) return false;
+      if (userReq.roleId === 3) {
+        return !(item['doctor.user.id'] === Number(reqUserId));
+      }
+      if (userReq.roleId <= 2) {
+        return !(item['patient.user.id'] === Number(reqUserId));
+      }
+      return true;
+    }
 
     return {
       status: 'success',
