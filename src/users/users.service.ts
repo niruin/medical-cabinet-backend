@@ -1,4 +1,9 @@
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  RequestMappingMetadata,
+  RequestMethod,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import * as bcrypt from 'bcrypt';
 
@@ -24,6 +29,30 @@ export class UsersService {
 
   findOne(filter: UsersFilter): Promise<any> {
     return this.userModel.findOne({ ...filter });
+  }
+
+  async remove(reqUserId: string, removeUserId: number): Promise<any> {
+    const userReq = await this.userModel.findOne({ where: { id: reqUserId } });
+
+    if (userReq.roleId !== 4 && userReq.id !== removeUserId) {
+      throw new ForbiddenException();
+    }
+
+    const userRemove = await this.userModel.findOne({ where: { id: removeUserId } });
+
+    if (userRemove.roleId === 2) {
+      await this.patientService.remove(removeUserId);
+    } else if (userRemove.roleId === 3) {
+      await this.doctorService.remove(removeUserId);
+    }
+
+    await this.userModel.destroy({
+      where: {
+        id: removeUserId,
+      },
+    });
+
+    return { status: 'success', message: 'Пользователь удален из системы' };
   }
 
   async profile(filter: UsersFilter): Promise<any> {

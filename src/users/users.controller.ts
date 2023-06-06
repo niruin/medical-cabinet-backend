@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Header,
   HttpCode,
@@ -29,6 +30,7 @@ import {
 } from './types';
 import { ChangeUserDto } from './dto/change-user.dto';
 import { ChangeRoleUserDto } from './dto/change-role-user.dto';
+import { DeleteUserDto } from './dto/delete-user.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -105,5 +107,13 @@ export class UsersController {
   changeRole(@Request() req, @Body() changeRoleUserDto: ChangeRoleUserDto) {
     const userIdReq = String(req.user.userId);
     return this.usersService.changerRoleAdminAccess(userIdReq, changeRoleUserDto);
+  }
+
+  @Delete('/delete')
+  @UseGuards(AuthenticatedGuard)
+  remove(@Request() req, @Body() { id }: DeleteUserDto) {
+    const userId = String(req.user.userId);
+
+    return this.usersService.remove(userId, id);
   }
 }
