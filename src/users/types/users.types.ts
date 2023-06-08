@@ -90,6 +90,8 @@ export class ProfileResponseData {
 
   @ApiProperty({ example: Roles.USER }) role: Roles.USER;
 
+  @ApiProperty({ example: 1 }) roleId: number;
+
   @ApiProperty({ example: '2023-03-17T17:23:33.502Z' }) updatedAt: string;
 
   @ApiProperty({ example: '2023-03-17T17:23:33.502Z' }) createdAt: string;

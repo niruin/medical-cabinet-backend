@@ -14,8 +14,7 @@ async function bootstrap() {
       secret: 'keyword',
       resave: false,
       saveUninitialized: false,
-      name: 'med-cabinet',
-      cookie: { httpOnly: false }, //TODO remove
+      name: 'session-token',
     }),
   );
 

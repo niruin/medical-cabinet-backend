@@ -59,10 +59,13 @@ export class UsersService {
     const user = await this.userModel.findOne({ ...filter });
     const role = await this.roleService.findOne({ where: { id: user.roleId } });
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...restUser } = user.dataValues;
+
     return {
       status: 'success',
       message: 'Профиль пользователя',
-      data: { ...user.dataValues, role: role.name },
+      data: { ...restUser, role: role.name },
     };
   }
 

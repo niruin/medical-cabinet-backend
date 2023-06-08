@@ -10,6 +10,7 @@ import {
   Post,
   Query,
   Request,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBody, ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -55,9 +56,11 @@ export class UsersController {
 
   @ApiOkResponse({ type: LogoutUserResponse })
   @Get('/logout')
-  logout(@Request() req) {
+  logout(@Request() req, @Res() res) {
     req.session.destroy();
-    return { status: 'success', message: 'Сессия завершена' };
+    res.clearCookie('session-token');
+    res.clearCookie('authorized');
+    return res.send({ status: 'success', message: 'Сессия завершена' });
   }
 
   @ApiOkResponse({ type: SignupResponse })
@@ -73,14 +76,18 @@ export class UsersController {
   @Post('/login')
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
-  login(@Request() req) {
-    return {
+  login(@Request() req, @Res() res) {
+    res.cookie('authorized', 'true');
+
+    const response = {
       status: 'success',
       message: 'Пользователь авторизован',
       data: {
         userId: req.user.userId,
       },
     };
+
+    res.send(response);
   }
 
   @ApiBody({ type: UserChangeRequest })
